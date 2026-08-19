@@ -1,0 +1,21 @@
+name: Build QMK Firmware
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: qmkfm/qmk_cli
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build Firmware
+        run: |
+          qmk compile -kb epomaker/galaxy100 -km default
+
+      - name: Upload Bin
+        uses: actions/upload-artifact@v3
+        with:
+          name: galaxy100_firmware
+          path: '*.bin'
