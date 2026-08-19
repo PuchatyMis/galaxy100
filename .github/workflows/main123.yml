@@ -1,0 +1,30 @@
+name: Build QMK Firmware
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: qmkfm/qmk_cli
+    steps:
+      - name: Checkout custom repo
+        uses: actions/checkout@v5
+        with:
+          path: custom_keyboard
+
+      - name: Setup QMK Firmware
+        run: |
+          qmk setup -y
+          mkdir -p qmk_firmware/keyboards/epomaker/galaxy100
+          cp -r custom_keyboard/* qmk_firmware/keyboards/epomaker/galaxy100/
+
+      - name: Build Firmware
+        run: |
+          cd qmk_firmware
+          qmk compile -kb epomaker/galaxy100 -km default
+
+      - name: Upload Bin
+        uses: actions/upload-artifact@v4
+        with:
+          name: galaxy100_firmware
+          path: 'qmk_firmware/*.bin'
